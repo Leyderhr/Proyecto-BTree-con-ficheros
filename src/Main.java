@@ -28,6 +28,16 @@ public class Main {
         b1.insert(20);
         b1.printTree();
 
-        System.out.println("Leyder es un puto y Adrian es un Gigollo");
+        b1.remove(20);
+        b1.remove(10);
+        b1.remove(5);
+        b1.remove(6);
+        b1.remove(11);
+        b1.remove(15);
+        b1.remove(18);
+        b1.printTree();
+
+        System.out.println(b1.find(20));
+
     }
 }

@@ -1,10 +1,13 @@
 package StructuredTree;
 
+import cu.edu.cujae.ceis.tree.TreeNode;
+
 import java.util.ArrayList;
 
-public class BTreeNode <E extends Comparable<E>>{
+@SuppressWarnings("unchecked")
+public class BTreeNode <E extends Comparable<E>> extends TreeNode<E> {
 
-    private int order;
+    private final int order;
     private boolean isLeaf;
     private ArrayList<E> keys;
     private ArrayList<BTreeNode<E>> childrens;
@@ -14,10 +17,6 @@ public class BTreeNode <E extends Comparable<E>>{
         keys = new ArrayList<>();
         childrens = new ArrayList<>();
         isLeaf = true;
-    }
-
-    public void setRoot(boolean root) {
-        isRoot = root;
     }
 
     public ArrayList<E> getKeys() {

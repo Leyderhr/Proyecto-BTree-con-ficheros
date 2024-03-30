@@ -3,7 +3,7 @@ package StructuredTree;
 
 import java.util.*;
 
-public class BTree<E extends Comparable<E>> {
+public class BTree<E extends Comparable<E>>{
 
     private BTreeNode<E> root;
 
@@ -315,7 +315,7 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
-    public void takeKey(BTreeNode<E> node, BTreeNode<E> firstSon, int pos) {
+    private void takeKey(BTreeNode<E> node, BTreeNode<E> firstSon, int pos) {
         BTreeNode<E> secondSon = pos != 0 ? node.getChildrens().get(pos - 1) : node.getChildrens().get(pos + 1);
 
         if (pos != 0 && nodeInRangeSize(secondSon.getKeys().size() - 1, secondSon.getOrder())) {
@@ -335,7 +335,7 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
-    public void joinSons(BTreeNode<E> node, int pos) {
+    private void joinSons(BTreeNode<E> node, int pos) {
         BTreeNode<E> firstSon = node.getChildrens().get(pos);
         BTreeNode<E> secondSon;
 
@@ -353,7 +353,7 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
-    public E findInmediateNextValor(BTreeNode<E> node, E valorCompare) {
+    private E findInmediateNextValor(BTreeNode<E> node, E valorCompare) {
 
         if (!node.isLeaf()) {
             int pos = node.findWhere(valorCompare);
@@ -366,7 +366,7 @@ public class BTree<E extends Comparable<E>> {
         return valorCompare;
     }
 
-    public boolean nodeInRangeSize(int size, int order) {
+    private boolean nodeInRangeSize(int size, int order) {
         return size >= ((order - 1) / 2);
     }
 
