@@ -242,6 +242,133 @@ public class BTree<E extends Comparable<E>> {
         return pivote;
     }
 
+        // Metodos relacionados con la busqueda de un valor en el arbol
+    // ===========================================================================
 
+    // Metodo para buscar en el arbol
+    // -----------------------------------------
+    public E find(E key) {
+        E valor = null;
 
+        if (!root.isEmpty())
+            valor = findKey(root, key);
+
+        return valor;
+    }
+    // -----------------------------------------
+
+    // Metodo de busqueda recursivo
+    // ----------------------------------------------------
+    private E findKey(BTreeNode<E> father, E key) {
+        E valor = null;
+        int pos = father.findWhere(key);
+
+        if (pos < father.getKeys().size() && father.getKeys().get(pos).equals(key))
+            valor = father.getKeys().get(pos);
+        else if (!father.isLeaf()) {
+            //pos = father.findWhere(key);
+            valor = findKey(father.getChildrens().get(pos), key);
+        }
+
+        return valor;
+    }
+    // ----------------------------------------------------
+
+    // ===========================================================================
+
+    // Metodos relacionados con la eliminacion de un valor del arbol
+    // ============================================================================
+    public void remove(E key) {
+        if (!root.isEmpty())
+            delete(root, key);
+    }
+
+    private void delete(BTreeNode<E> node, E key) {
+        if (node != null) {
+            int pos = node.findWhere(key);
+
+            if (pos < node.getKeys().size() && node.getKeys().get(pos).equals(key) && node.isLeaf())
+                node.getKeys().remove(pos);
+            else {
+                BTreeNode<E> son;
+
+                if (pos < node.getKeys().size() && node.getKeys().get(pos).equals(key)) {
+                    son = node.getChildrens().get(pos + 1);
+                    E valor = findInmediateNextValor(son, key);
+                    node.getKeys().set(pos++, valor);
+                    delete(son, valor);
+                } else {
+                    
+                    // pos = node.findWhere(key);
+                    son = !node.isLeaf() ? node.getChildrens().get(pos) : null;
+                    delete(son, key);
+                }
+
+                if (son != null && !nodeInRangeSize(son.getKeys().size(), son.getOrder())) {
+                    takeKey(node, son, pos);
+                }
+                if (root.getKeys().isEmpty() && node.isRoot() == 1) {
+                    node.getChildrens().get(0).setRoot(1);
+                    setRoot(node.getChildrens().get(0));
+                }
+            }
+        }
+    }
+
+    public void takeKey(BTreeNode<E> node, BTreeNode<E> firstSon, int pos) {
+        BTreeNode<E> secondSon = pos != 0 ? node.getChildrens().get(pos - 1) : node.getChildrens().get(pos + 1);
+
+        if (pos != 0 && nodeInRangeSize(secondSon.getKeys().size() - 1, secondSon.getOrder())) {
+            firstSon.addKey(node.getKeys().remove(pos - 1));
+            node.addKey(secondSon.getKeys().remove(secondSon.getKeys().size() - 1));
+            if (!firstSon.isLeaf())
+                firstSon.getChildrens().add(0, secondSon.getChildrens().remove(secondSon.getChildrens().size() - 1));
+        } else {
+            if (pos != node.getChildrens().size() - 1
+                    && nodeInRangeSize(secondSon.getKeys().size() - 1, secondSon.getOrder())) {
+                firstSon.addKey(node.getKeys().remove(pos));
+                node.addKey(secondSon.getKeys().remove(0));
+                if (!firstSon.isLeaf())
+                    firstSon.getChildrens().add(secondSon.getChildrens().remove(0));
+            } else
+                joinSons(node, pos);
+        }
+    }
+
+    public void joinSons(BTreeNode<E> node, int pos) {
+        BTreeNode<E> firstSon = node.getChildrens().get(pos);
+        BTreeNode<E> secondSon;
+
+        if (pos < node.getChildrens().size() - 1) {
+            secondSon = node.getChildrens().remove(pos + 1);
+            firstSon.getKeys().addAll(secondSon.getKeys());
+            firstSon.getChildrens().addAll(secondSon.getChildrens());
+            firstSon.addKey(node.getKeys().remove(pos));
+        } else {
+            secondSon = node.getChildrens().get(pos - 1);
+            secondSon.getKeys().addAll(firstSon.getKeys());
+            secondSon.getChildrens().addAll(firstSon.getChildrens());
+            secondSon.addKey(node.getKeys().remove(pos - 1));
+            node.getChildrens().remove(pos);
+        }
+    }
+
+    public E findInmediateNextValor(BTreeNode<E> node, E valorCompare) {
+
+        if (!node.isLeaf()) {
+            int pos = node.findWhere(valorCompare);
+            BTreeNode<E> son = node.getChildrens().get(pos);
+            valorCompare = findInmediateNextValor(son, valorCompare);
+
+        } else
+            valorCompare = node.getKeys().get(0);
+
+        return valorCompare;
+    }
+
+    public boolean nodeInRangeSize(int size, int order) {
+        return size >= ((order - 1) / 2);
+    }
+
+    // ============================================================================
 }
