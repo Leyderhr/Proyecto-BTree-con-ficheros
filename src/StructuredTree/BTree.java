@@ -180,35 +180,11 @@ public class BTree<E extends Comparable<E>> {
     }
 
 
-    /**
-     * Metodo para buscar un key en el arbol, retorna el nodo donde se encuentra
-     */
-    public BTreeNode<E> searchInBTree1(BTreeNode<E> root, E value) {
-        int i = 0;//indice de busqueda
-
-        if (root != null) {
-            while (i < root.getKeys().size() && value.compareTo(root.getKeys().get(i)) > 0) {
-                i++;
-            }
-
-            if (i < root.getKeys().size() && value == root.getKeys().get(i)) {
-                return root;
-            }
-
-            if (root.isLeaf()) {
-                return null;
-            } else {
-                return searchInBTree1(root.getChildrens().get(i), value);
-            }
-        }
-
-        return searchInBTree1(root.getChildrens().get(i), value);
-    }
-
 
     /**
      * Metodos para imprimir el albol, uno imprime las claves con cada nivel y el otro todo el arbol
      */
+    //Este metodo imprime cada clave con su nivel
     public void printBTree(BTreeNode<E> root) {
         printBTree(root, 0);
     }
@@ -229,6 +205,7 @@ public class BTree<E extends Comparable<E>> {
         }
     }
 
+    //Este metodo imprime el arbol completo, por niveles
     public void printTree() {
         List<BTreeNode<E>> currLevel = new ArrayList<>();
         currLevel.add(this.root);
@@ -266,129 +243,5 @@ public class BTree<E extends Comparable<E>> {
     }
 
 
-    /**
-     * Metodo para guardar la posicion de un key en un nodo
-     * <li>Parametro node: Nodo en el que queremos buscar el key</li>
-     * <li>Parametro key: Valor que queremos buscar</li>
-     */
-    private int getPosition(BTreeNode<E> node, E key) {
-        int i = 0;
-        int pos = -1;
-
-        while (i < node.getKeys().size()) {
-            if (key == node.getKeys().get(i)) {
-                pos = i;
-                break;
-            } else if (key.compareTo(node.getKeys().get(i)) < 0) {
-                break;
-            }
-            i += 1;
-        }
-        return pos;
-    }
-
-
-    /**
-     * Metodo para encontrar el valor inmediato inferior para sustituir en el proceso de eliminar
-     */
-    private E getMinKey(BTreeNode<E> node) {
-        while (!node.isLeaf()) {
-            node = node.getChildrens().get(0);
-        }
-        return node.getKeys().get(0);
-    }
-
-    /**
-     * Metodos de eliminar
-     */
-    public void delete(E key) {
-        if (!(root == null))
-            remove(root, key);
-    }
-
-    private void remove(BTreeNode<E> node, E key) {
-
-        if (node != null) {
-            int index = getPosition(node, key);
-            if (index > -1 && node.isLeaf())
-                node.getKeys().remove(index);
-            else {
-                BTreeNode<E> children;
-
-
-                if (index > -1) {
-                    children = node.getChildrens().get(index + 1);
-                    E valor = getMinKey(children);
-
-                    node.getKeys().set(index, valor);
-                    remove(children, valor);
-                } else {
-
-                    index = node.findWhere(key);
-                    children = !node.isLeaf() ? node.getChildrens().get(index) : null;
-                    remove(children, key);
-                }
-
-                if (children != null && !nodeInRangeSize(children.getKeys().size(), children.getOrder())) {
-                    staleKey(node, children, index);
-                }
-                /*Si el nodo se queda sin llaves, xq fusiono a sus hijos, establece a los hijos
-                 como nueva raiz*/
-                if (root.getKeys().isEmpty()) {
-                    node.getChildrens().get(0).setRoot(true);
-                    setRoot(node.getChildrens().get(0));
-                }
-            }
-        }
-    }
-
-    public void staleKey(BTreeNode<E> node, BTreeNode<E> firstChild, int pos) {
-        BTreeNode<E> secondChild = pos != 0 ? node.getChildrens().get(pos - 1) : node.getChildrens().get(pos + 1);
-
-        if (pos != 0 && nodeInRangeSize(secondChild.getKeys().size() - 1, secondChild.getOrder())) {
-            firstChild.addKey(node.getKeys().remove(pos - 1));
-            node.addKey(secondChild.getKeys().remove(secondChild.getKeys().size() - 1));
-        } else {
-            if (pos != node.getChildrens().size() - 1 && nodeInRangeSize(secondChild.getKeys().size() - 1, secondChild.getOrder())) {
-                firstChild.addKey(node.getKeys().remove(pos));
-                node.addKey(secondChild.getKeys().remove(0));
-            } else
-                mergeSons(node, pos);
-        }
-    }
-
-
-    /**
-     * Metodo para unir los hijos de un nodo
-     * <li>Parametro node: nodo padre</li>
-     * <li>Paramtro pos: Posicion del nodo hijo que necesitamos rellenar</li>
-     */
-    public void mergeSons(BTreeNode<E> node, int pos) {
-        BTreeNode<E> firstChild = node.getChildrens().get(pos);
-        BTreeNode<E> secondChild;
-
-        if (pos < node.getChildrens().size() - 1) {
-            secondChild = node.getChildrens().remove(pos + 1);
-            firstChild.getKeys().addAll(secondChild.getKeys());
-            firstChild.getChildrens().addAll(secondChild.getChildrens());
-            firstChild.addKey(node.getKeys().remove(pos));
-        } else {
-            secondChild = node.getChildrens().get(pos - 1);
-            secondChild.getKeys().addAll(firstChild.getKeys());
-            secondChild.getChildrens().addAll(firstChild.getChildrens());
-            secondChild.addKey(node.getKeys().remove(pos - 1));
-            node.getChildrens().remove(pos);
-        }
-    }
-
-
-    /**
-     * Metodo para calcular el rango minimo de un nodo
-     * <li>Parametro size: Tamaño del array</li>
-     * <li>Parametro order: Orden que debe tener el arbol (cantidad maxima de keys)</li>
-     */
-    public boolean nodeInRangeSize(int size, int order) {
-        return size >= ((order - 1) / 2);
-    }
 
 }
