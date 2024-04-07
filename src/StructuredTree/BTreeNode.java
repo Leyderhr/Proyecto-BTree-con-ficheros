@@ -107,7 +107,7 @@ public class BTreeNode<E extends Comparable<E>> extends TreeNode<E> implements S
     }
 
     // Ejemplo de método para serializar el nodo
-    public void writeObject(ObjectOutputStream out, BTreeNode root) throws IOException {
+    public void writeObject(ObjectOutputStream out, BTreeNode<E> root) throws IOException {
         File_Access a = new File_Access();
         a.escribir(root, out);
 //        out.writeInt(order);
