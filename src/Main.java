@@ -1,4 +1,7 @@
 import StructuredTree.BTree;
+import StructuredTree.BTreeNode;
+
+import java.io.*;
 
 public class Main {
 
@@ -27,6 +30,13 @@ public class Main {
         b1.insert(19);
         b1.insert(20);
         b1.printTree();
+
+        try(ObjectOutputStream fichero = new ObjectOutputStream(new FileOutputStream("E:/Escuela de Leyder/Carrera Informática/2do año/1er Semestre/Estructura de Datos (ED)/2024/ProyectoFinalBTree/src/Util/CarFile.txt"))){
+            b1.getRoot().writeObject(fichero, b1.getRoot());
+            BTreeNode a = b1.getRoot().readObject(new ObjectInputStream(new FileInputStream("E:/Escuela de Leyder/Carrera Informática/2do año/1er Semestre/Estructura de Datos (ED)/2024/ProyectoFinalBTree/src/Util/CarFile.txt")));
+        }catch (IOException e){
+            System.out.println("No se ha encontrado el archivo");
+        }
 
         b1.remove(20);
         b1.remove(10);

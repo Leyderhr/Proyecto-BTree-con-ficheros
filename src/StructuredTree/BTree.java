@@ -1,9 +1,11 @@
 package StructuredTree;
 
 
+import java.io.*;
 import java.util.*;
 
-public class BTree<E extends Comparable<E>>{
+public class BTree<E extends Comparable<E>> implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     private BTreeNode<E> root;
 
@@ -371,4 +373,9 @@ public class BTree<E extends Comparable<E>>{
     }
 
     // ============================================================================
+
+
+
+    //Metodos de SERIALIZACION
+
 }
